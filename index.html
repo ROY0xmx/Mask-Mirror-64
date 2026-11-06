@@ -29,9 +29,10 @@
   .history-section { margin-bottom: 22px; border: 1px solid #eaeaea; background: #f9fafb; border-radius: 18px; padding: 16px 18px; }
   .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: #0b2b4a; font-weight: 600; font-size: 1rem; }
   .history-clear { background: none; border: none; color: #4a5b6b; font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
-  .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
-  .history-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .history-item .h-type { font-weight: 700; color: #0b2b4a; font-size: 0.95rem; }
+  .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+  .history-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; cursor: pointer; transition: all 0.2s; }
+  .history-item:hover { border-color: #1e3c5a; box-shadow: 0 4px 12px rgba(30,60,90,0.08); }
+  .history-item .h-type { font-weight: 700; color: #0b2b4a; font-size: 1rem; }
   .history-item .h-meta { font-size: 0.8rem; color: #6b7d8f; }
   .history-empty { color: #8a9aa8; font-size: 0.9rem; padding: 4px 0; }
   .progress-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-weight: 500; gap: 8px; flex-wrap: wrap; }
@@ -73,10 +74,10 @@
   .dim-fill-left { height: 100%; background: #1e3c5a; }
   .dim-fill-right { height: 100%; background: #b0c4d4; }
   .dim-pct { width: 40px; text-align: right; font-weight: 500; color: #1e3c5a; font-size: 0.8rem; flex-shrink: 0; }
-  .result-desc { font-size: clamp(0.9rem, 3.2vw, 1rem); color: #3f5567; line-height: 1.75; margin-bottom: 26px; border-top: 1px solid #e0e0e0; padding-top: 22px; }
-  .result-desc p { margin-bottom: 14px; }
-  .result-desc h3 { font-size: 1.05rem; color: #0b2b4a; margin: 20px 0 10px; font-weight: 600; }
-  .result-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .result-desc { font-size: clamp(0.9rem, 3.2vw, 1rem); color: #3f5567; line-height: 1.85; margin-bottom: 26px; border-top: 1px solid #e0e0e0; padding-top: 22px; }
+  .result-desc p { margin-bottom: 16px; text-indent: 2em; text-align: justify; }
+  .result-desc h3 { font-size: 1.15rem; color: #0b2b4a; margin: 28px 0 14px; font-weight: 600; border-left: 4px solid #1e3c5a; padding-left: 10px; text-indent: 0; }
+  .result-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 30px; }
   .restart-btn { background: #fff; border: 1.5px solid #1e3c5a; border-radius: 40px; padding: 13px 36px; font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 500; color: #1e3c5a; cursor: pointer; transition: all .1s ease; }
   .restart-btn:hover { background: #1e3c5a; color: #fff; }
   .hidden { display: none; }
@@ -103,7 +104,7 @@
 <body>
 <div class="test-container">
   <h1>MBTI 64人格 · 测谎版</h1>
-  <div class="subhead">表面亚型 vs 内在亚型 · 三阶深度探索</div>
+  <div class="subhead">表面亚型 vs 内在亚型 · 三阶深度解析</div>
 
   <div class="top-bar">
     <div class="version-tabs">
@@ -116,7 +117,7 @@
 
   <div class="history-section hidden" id="mainHistorySection">
     <div class="history-header">
-      <span>测试历史</span>
+      <span>测试历史（点击可查看解析）</span>
       <button class="history-clear" id="mainHistoryClear">清空</button>
     </div>
     <div class="history-list" id="mainHistoryList"></div>
@@ -166,7 +167,9 @@
 
 <script>
 (function(){
-  /* ========== 基础题库（表面计分） ========== */
+  // ==========================================
+  // 完整题库（40/100/200题，无缩减）
+  // ==========================================
   const SIMPLE_BASE = [
     { text: "在聚会中，你更倾向于：", options: [{ label: "主动认识很多人，享受热闹", value: "E" }, { label: "和几个熟人深入聊天", value: "I" }, { label: "观察大家，偶尔加入话题", value: "I" }, { label: "成为焦点，带动气氛", value: "E" }] },
     { text: "面对一个新项目，你首先：", options: [{ label: "立刻动手，边做边调整", value: "S" }, { label: "先规划整体框架和可能性", value: "N" }, { label: "参考过往经验，按流程推进", value: "S" }, { label: "构思多种创意方案", value: "N" }] },
@@ -210,7 +213,6 @@
     { text: "你更认同：", options: [{ label: "行动胜于言语", value: "E" }, { label: "思考胜于行动", value: "I" }, { label: "多交流才能碰撞火花", value: "E" }, { label: "安静思考才能深入", value: "I" }] }
   ];
 
-  /* ========== 测谎版专用：隐藏维度题库 ========== */
   const LIE_BASE = [
     { text: "当你说“我没事”的时候，通常：", options: [{ label: "其实心里很在意，但不想表现出来", value: "I" }, { label: "确实没什么，过去就过去了", value: "E" }, { label: "希望有人能追问一句", value: "F" }, { label: "只是不想解释太多", value: "T" }] },
     { text: "别人夸你时，你内心的第一反应：", options: [{ label: "开心，但有点怀疑对方是否真心", value: "T" }, { label: "被看见了，很温暖", value: "F" }, { label: "有点不好意思，想转移话题", value: "I" }, { label: "顺着夸回去，保持气氛", value: "E" }] },
@@ -246,19 +248,9 @@
     { text: "你更害怕别人发现你：", options: [{ label: "其实很脆弱", value: "F" }, { label: "其实很依赖", value: "I" }, { label: "其实很固执", value: "T" }, { label: "其实很迷茫", value: "N" }] },
     { text: "你更常在哪里“报喜不报忧”？", options: [{ label: "朋友圈", value: "E" }, { label: "和家人的电话里", value: "F" }, { label: "和同事的聊天里", value: "T" }, { label: "几乎不报忧", value: "I" }] },
     { text: "你更愿意承认自己：", options: [{ label: "其实很想被理解", value: "F" }, { label: "其实很想赢", value: "T" }, { label: "其实很想逃", value: "I" }, { label: "其实很想被抱一下", value: "E" }] },
-    { text: "你更常因为什么而“假装没事”？", options: [{ label: "不想让别人担心", value: "F" }, { label: "不想显得软弱", value: "T" }, { label: "不想解释", value: "I" }, { label: "不想被追问", value: "P" }] },
-    { text: "你更常在哪件事上“报喜不报忧”？", options: [{ label: "工作/学业", value: "T" }, { label: "感情", value: "F" }, { label: "身体状态", value: "S" }, { label: "全部", value: "I" }] },
-    { text: "你更愿意承认自己：", options: [{ label: "需要被肯定", value: "F" }, { label: "需要被理解", value: "N" }, { label: "需要被需要", value: "E" }, { label: "需要独处", value: "I" }] },
-    { text: "当有人试图靠近你，你会：", options: [{ label: "慢慢观察，再决定", value: "T" }, { label: "有点慌，想后退", value: "I" }, { label: "很开心，也想靠近", value: "F" }, { label: "顺势互动，但不深入", value: "E" }] },
-    { text: "你更常因为什么而说“没关系”？", options: [{ label: "真的没关系", value: "P" }, { label: "不想让对方内疚", value: "F" }, { label: "不想显得小气", value: "T" }, { label: "不想继续纠缠", value: "I" }] },
-    { text: "你更常在哪件事上“假装不在意”？", options: [{ label: "被比较的时候", value: "F" }, { label: "被忽略的时候", value: "I" }, { label: "被误解的时候", value: "T" }, { label: "被拒绝的时候", value: "E" }] },
-    { text: "你更愿意承认自己：", options: [{ label: "其实很怕麻烦别人", value: "F" }, { label: "其实很想被主动联系", value: "I" }, { label: "其实很在意输赢", value: "T" }, { label: "其实很想被看见", value: "E" }] },
-    { text: "你更常把真实情绪藏在：", options: [{ label: "表情里", value: "F" }, { label: "沉默里", value: "I" }, { label: "玩笑里", value: "E" }, { label: "忙碌里", value: "S" }] },
-    { text: "你更常在哪方面“口是心非”？", options: [{ label: "明明想留下，却说走吧", value: "F" }, { label: "明明很在意，却说无所谓", value: "I" }, { label: "明明不懂，却说还行", value: "T" }, { label: "明明很累，却说没事", value: "P" }] },
-    { text: "你更害怕别人发现你：", options: [{ label: "其实很脆弱", value: "F" }, { label: "其实很依赖", value: "I" }, { label: "其实很固执", value: "T" }, { label: "其实很迷茫", value: "N" }] }
+    { text: "你更常因为什么而“假装没事”？", options: [{ label: "不想让别人担心", value: "F" }, { label: "不想显得软弱", value: "T" }, { label: "不想解释", value: "I" }, { label: "不想被追问", value: "P" }] }
   ];
 
-  /* ========== 深度版题库（表面计分） ========== */
   const DEEP_BASE = (function(){
     const result = [];
     const templates = [
@@ -352,7 +344,7 @@
     ESFP: { title: "表演者", tag: "热情洋溢的当下享受者" }
   };
 
-  const STORAGE_KEY = 'mbti_64_lie_history_v1';
+  const STORAGE_KEY = 'mbti_64_lie_history_v2';
 
   function shuffle(arr) {
     const a = arr.slice();
@@ -564,23 +556,145 @@
     )).join('');
   }
 
-  function getDisguiseLevel(outerType, innerType) {
-    let diff = 0;
-    for (let i = 0; i < 4; i++) {
-      if (outerType[i] !== innerType[i]) diff++;
+  // ==========================================
+  // 解析生成引擎：侧重伪装原因与真实自我
+  // ==========================================
+  function generateDetailedText(outerType, innerType, disguise, version) {
+    const outerBase = outerType.substring(0, 4);
+    const innerBase = innerType.substring(0, 4);
+    const outerInfo = TYPE_DESC[outerBase] || { title: '探索者', tag: '独特的人格组合' };
+    const innerInfo = TYPE_DESC[innerBase] || { title: '探索者', tag: '独特的人格组合' };
+    
+    // 找出表里不同的维度
+    const diffDims = [];
+    if (outerBase[0] !== innerBase[0]) diffDims.push('E/I');
+    if (outerBase[1] !== innerBase[1]) diffDims.push('S/N');
+    if (outerBase[2] !== innerBase[2]) diffDims.push('T/F');
+    if (outerBase[3] !== innerBase[3]) diffDims.push('J/P');
+
+    let html = '';
+    
+    // --- 核心解析开始 ---
+    html += `<h3>【表里全貌】你的双重面具</h3>
+      <p>你的表面人格是 <strong>${outerType}</strong>（${outerInfo.title}），而你的内在人格是 <strong>${innerType}</strong>（${innerInfo.title}）。伪装指数为 <strong>${disguise}%</strong>。</p>`;
+      
+    if (disguise === 0) {
+      html += `<p>恭喜你，你是一个非常罕见、表里如一的真实个体。你不需要戴着面具生活，你呈现给世界的就是你内心的样子。这种高度的自洽让你内耗极低，但也意味着你在面对复杂的社会环境时，可能少了一些“圆滑”和“保护色”。你不需要刻意去学虚伪，保持这份真诚，就是对你最大的奖赏。</p>`;
+    } else {
+      html += `<p>你在 <strong>${diffDims.join('、')}</strong> 维度上出现了明显的撕裂。这意味着你在某些时候，不得不“表演”出另一个自己。这种表演并非虚伪，而是你的心理防御机制为了适应环境而做出的妥协。</p>`;
     }
-    return Math.round((diff / 4) * 100);
+
+    // --- 伪装原因剖析（针对每个差异维度进行深度解析） ---
+    html += `<h3>【伪装解剖】你为什么要“演”？</h3>`;
+    
+    if (diffDims.includes('E/I')) {
+      const oE = outerBase[0] === 'E';
+      const iE = innerBase[0] === 'E';
+      if (oE && !iE) {
+        html += `<p><strong>你为什么会“假外向”？</strong> 你表面上看起来热情、健谈、喜欢社交（表面 E），但你的内心深处其实极度渴望安静和独处（内在 I）。你之所以伪装成外向，大概率是因为在这个社会里，内向常常被误解为“不合群”或“高冷”。你害怕被孤立，或者因为工作需要不得不去社交。你在人群中的大笑和应酬，其实是在疯狂消耗你的能量。每次聚会结束后，你都需要用好几天的独处来回血。你最大的伪装，就是假装自己“毫不费力”地融入人群。</p>`;
+      } else {
+        html += `<p><strong>你为什么会“假内向”？</strong> 你表面上看起来文静、收敛、不爱出风头（表面 I），但你的内心深处其实充满了表达的欲望，极其渴望与人互动（内在 E）。你伪装成内向，可能是因为你在成长过程中曾被批评过“太吵”、“太出风头”，或者你害怕自己的热情会被别人冷落。你为了自我保护，选择了沉默和退缩。但实际上，你内心有一个巨大的舞台，你渴望被看见、被倾听、被掌声包围。</p>`;
+      }
+    }
+
+    if (diffDims.includes('S/N')) {
+      const oS = outerBase[1] === 'S';
+      const iS = innerBase[1] === 'S';
+      if (oS && !iS) {
+        html += `<p><strong>你为什么会“装作务实”？</strong> 你对外表现得关注现实、看重细节、追求稳定（表面 S），但你的脑海里其实充满了天马行空的幻想和对未来的宏大构想（内在 N）。你之所以伪装成实感型，是因为这个社会要求你必须“脚踏实地”、“柴米油盐”。你害怕别人觉得你“不切实际”或“想太多”，所以你强迫自己去记数字、走流程。但在夜深人静时，你的灵魂其实在星辰大海中遨游。</p>`;
+      } else {
+        html += `<p><strong>你为什么会“装作高深”？</strong> 你对外表现得喜欢谈论意义、抽象概念、未来愿景（表面 N），但你的骨子里其实是一个极其注重现实感官、关注当下细节的人（内在 S）。你伪装成直觉型，可能是因为你觉得谈论柴米油盐太俗气，或者你所在的圈子推崇“深度思考”。你会强迫自己去读那些晦涩的哲学书，去说那些听起来很高深的词汇，但你内心最真实的渴望，不过是一顿美食、一个舒服的觉，和一个看得见摸得着的拥抱。</p>`;
+      }
+    }
+
+    if (diffDims.includes('T/F')) {
+      const oT = outerBase[2] === 'T';
+      const iT = innerBase[2] === 'T';
+      if (oT && !iT) {
+        html += `<p><strong>你为什么会“装作冷酷”？</strong> 你对外表现得极其理智、客观、不讲情面（表面 T），但你内心其实是一个非常柔软、极度共情、容易被感动的人（内在 F）。你伪装成思考型，是因为你曾经因为太善良、太心软而受过伤。你发现“讲感情”在这个世界上容易吃亏，所以你给自己穿上了一层理性的铠甲。你用冷漠来推开别人，其实是害怕自己再次受伤。你的“毒舌”和“冷酷”，往往是你最脆弱的防线。</p>`;
+      } else {
+        html += `<p><strong>你为什么会“装作随和”？</strong> 你对外表现得善解人意、脾气温和、甚至有点讨好型（表面 F），但你内心其实极其冷静、甚至觉得周围人的情绪很可笑（内在 T）。你伪装成情感型，是因为你极其聪明地意识到：在人际关系中，“讲道理”是行不通的，唯有提供情绪价值，才能最快地达成目的。你的温柔是一把刀，你的妥协是为了更好地掌控全局。你面带微笑，看着别人为你所用的感觉，让你觉得很安全。</p>`;
+      }
+    }
+
+    if (diffDims.includes('J/P')) {
+      const oJ = outerBase[3] === 'J';
+      const iJ = innerBase[3] === 'J';
+      if (oJ && !iJ) {
+        html += `<p><strong>你为什么会“装作自律”？</strong> 你对外表现得计划性极强、有条理、强迫症（表面 J），但你内心其实极其渴望自由、随性、摆烂（内在 P）。你伪装成判断型，是因为你极度害怕失控。你讨厌不确定的未来，所以你用密密麻麻的计划表来获得安全感。别人以为你是一个自律的机器人，其实你每天都在和自己的拖延症作斗争。</p>`;
+      } else {
+        html += `<p><strong>你为什么会“装作随性”？</strong> 你对外表现得随遇而安、不拘小节、佛系（表面 P），但你内心其实极度渴望秩序、控制权，以及一个确定的未来（内在 J）。你伪装成知觉型，可能是因为你讨厌别人干涉你的决定，或者你不想让自己看起来“太死板”。你嘴上说着“随便、都行”，其实心里早就有了一个不可更改的标准答案。</p>`;
+      }
+    }
+
+    // --- 真实未被伪装的部分 ---
+    html += `<h3>【真实底色】你没有伪装的部分</h3>`;
+    if (disguise === 0) {
+      html += `<p>你的所有特质都是真实的。你不需要区分哪里是面具，哪里是本质。${innerInfo.tag}就是你的本色。</p>`;
+    } else {
+      const sameDims = [];
+      if (outerBase[0] === innerBase[0]) sameDims.push(`能量倾向（${outerBase[0]}）`);
+      if (outerBase[1] === innerBase[1]) sameDims.push(`信息获取（${outerBase[1]}）`);
+      if (outerBase[2] === innerBase[2]) sameDims.push(`决策方式（${outerBase[2]}）`);
+      if (outerBase[3] === innerBase[3]) sameDims.push(`生活节奏（${outerBase[3]}）`);
+      
+      html += `<p>无论你在外面怎么伪装，你的 <strong>${sameDims.join('、')}</strong> 是绝对真实的，这是你最不肯妥协的部分。</p>`;
+      
+      if (outerBase[0] === innerBase[0]) {
+        html += `<p>在 <strong>能量倾向</strong> 上，你没有伪装。你是一个真实的 ${outerBase[0] === 'E' ? '外向者' : '内向者'}。${outerBase[0] === 'E' ? '你确实喜欢和人打交道，社交能给你带来真正的快乐，而不只是为了应酬。' : '你确实需要大量的独处空间，只有在安静的时候，你才觉得可以做回自己。'}</p>`;
+      }
+      if (outerBase[1] === innerBase[1]) {
+        html += `<p>在 <strong>信息获取</strong> 上，你没有伪装。你是一个真实的 ${outerBase[1] === 'S' ? '实感者' : '直觉者'}。${outerBase[1] === 'S' ? '你确实关注现实和细节，那些看得见摸得着的东西才能给你安全感。' : '你确实总是脑洞大开，思考未来的可能性，那些宏大的概念才是你的精神食粮。'}</p>`;
+      }
+      if (outerBase[2] === innerBase[2]) {
+        html += `<p>在 <strong>决策方式</strong> 上，你没有伪装。你是一个真实的 ${outerBase[2] === 'T' ? '思考者' : '情感者'}。${outerBase[2] === 'T' ? '在面对核心利益和原则问题时，你确实会保持绝对的理智，不会被感情左右。' : '在面对你在意的人和事时，你确实会感情用事，哪怕知道不理智，你也愿意为了感情买单。'}</p>`;
+      }
+      if (outerBase[3] === innerBase[3]) {
+        html += `<p>在 <strong>生活节奏</strong> 上，你没有伪装。你是一个真实的 ${outerBase[3] === 'J' ? '判断者' : '知觉者'}。${outerBase[3] === 'J' ? '在你能掌控的领域里，你确实喜欢计划和秩序，讨厌被打乱。' : '在你觉得安全的环境里，你确实喜欢随性自由，讨厌被束缚。'}</p>`;
+      }
+    }
+
+    if (version === 40) {
+      return html + `<p>记住，面具戴久了会长在脸上。适当地卸下伪装，拥抱你真实的内在，你会发现，做自己远比演别人轻松得多。</p>`;
+    }
+
+    // --- 普通版与深度版专属：场景化深度分析 ---
+    html += `<h3>【亲密关系】你在爱里的伪装与真实</h3>`;
+    if (disguise > 0) {
+      html += `<p>在亲密关系中，你最容易因为“${diffDims.join('、')}”的伪装而和伴侣产生隔阂。伴侣往往爱上的是你展现出来的那个“表面人格”，但随着时间的推移，你的“内在人格”会逐渐暴露。这时候，伴侣可能会觉得你“变了”，而你会觉得“原来你还是不懂我”。</p>`;
+      if (diffDims.includes('T/F')) {
+        html += `<p>如果你伪装了 T/F 维度，你在恋爱中可能会表现出一种“口是心非”。你明明很在意，却要用冷漠去推开对方；或者你明明有自己的小算盘，却要装作无比深情。你需要向伴侣坦白你的真实防御机制，告诉对方：“我有时候推开你，不是不爱，而是我害怕受伤害。”</p>`;
+      }
+      if (diffDims.includes('E/I')) {
+        html += `<p>如果你伪装了 E/I 维度，你在恋爱中最大的痛苦就是能量的错位。你可能会为了迎合伴侣而过度社交，导致自己精疲力尽，然后突然爆发。你需要勇敢地告诉伴侣你的底线：“我需要一个人待一会儿，这与你无关，只是我需要回血。”</p>`;
+      }
+    } else {
+      html += `<p>你在感情中表里如一，这让你的伴侣非常有安全感。你不会藏着掖着，开心就是开心，生气就是生气。但也因为缺乏弹性，你们在吵架时，可能很难找到回旋的余地。适当地在非原则问题上妥协，是你需要学习的课题。</p>`;
+    }
+
+    if (version === 100) {
+      return html + `<p>以上是为你量身定制的深度解析。接受自己的面具，理解自己的防御机制，也珍视自己未被伪装的真实底色，你会走得更远。</p>`;
+    }
+
+    // --- 深度版专属：压力、职场与终极救赎 ---
+    html += `<h3>【职场博弈】你的生存策略与精神内耗</h3>`;
+    if (diffDims.includes('J/P')) {
+      html += `<p>在职场中，由于你对 J/P 维度的伪装，你常常处于一种极大的精神内耗中。你强迫自己去符合 ${outerBase[3] === 'J' ? '死板的流程和KPI' : '无组织无纪律的弹性工作'}，但你的本能却在抗议。你可能会在工作中突然感到极度的疲惫和意义缺失，那是因为你的真实性在向你报警。</p>`;
+    }
+    if (diffDims.includes('S/N')) {
+      html += `<p>在解决问题时，你看起来像是 ${outerBase[1] === 'S' ? '一个精算师' : '一个战略家'}，但你真正的杀手锏其实是 ${innerBase[1] === 'S' ? '对现实资源的敏锐把控' : '对底层逻辑的洞察'}。当你敢于在关键时刻展现你真正的内在特质时，往往能爆发出惊人的力量。</p>`;
+    }
+
+    html += `<h3>【终极救赎】走向人格的完整与真实</h3>`;
+    html += `<p>你的伪装，是你在漫长的岁月中，为了保护自己而进化出的铠甲。你不必为自己的“虚伪”感到羞耻，因为那是你生存的智慧。</p>`;
+    html += `<p>但是，人不能永远穿着铠甲睡觉。你需要找到一些让你感到绝对安全的角落、一些能完全接纳你的人，在那里，你可以毫无顾忌地切换回你的 <strong>${innerType}</strong> 状态。</p>`;
+    html += `<p>真正的成熟，不是永远只展现真实的一面，也不是永远戴着完美的面具，而是<strong>有选择的能力</strong>。你可以熟练地使用你的面具去应对外界，但你也必须清楚地知道，脱下西装、卸下妆容后，那个 <strong>${innerType}</strong> 才是你灵魂的归宿。</p>`;
+    html += `<p>去看见那个隐藏在深处的自己，去抱抱那个受了委屈的内在小孩，告诉他/她：“没关系，辛苦了，现在你可以做回你自己了。”</p>`;
+
+    return html;
   }
 
-  function getDisguiseNote(pct) {
-    if (pct === 0) return '你的表面人格与内在人格高度一致。你呈现给世界的，基本就是真实的自己。这是一种难得的坦诚。';
-    if (pct <= 25) return '你大部分时候是真实的，只有某一维度上会不自觉地“修饰”自己。这种小伪装通常是社交润滑，不必过于在意。';
-    if (pct <= 50) return '你在两个维度上呈现出表里差异。你可能在某些场合习惯性地戴上面具，但内心始终知道真实的自己是什么样。';
-    if (pct <= 75) return '你的表面人格与内在人格有较大差异。你可能长期在扮演一个“更安全”的角色，而真实的自己被藏得比较深。';
-    return '你的表面人格与内在人格几乎完全不同。你可能非常擅长适应环境，也可能已经很久没有问过自己“我真正想要什么”。这是一个值得认真对待的信号。';
-  }
-
-  function saveToHistory(outer, inner, version, counts) {
+  function saveToHistory(outer, inner, version, counts, disguise, descHtml) {
     let history = [];
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -591,6 +705,8 @@
       inner,
       version,
       counts,
+      disguise,
+      descHtml,
       time: new Date().toLocaleString('zh-CN')
     });
     if (history.length > 20) history = history.slice(0, 20);
@@ -607,12 +723,58 @@
       mainHistoryList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
       return;
     }
-    mainHistoryList.innerHTML = history.map(h => (
-      '<div class="history-item">' +
+    mainHistoryList.innerHTML = history.map((h, index) => (
+      '<div class="history-item" onclick="window.viewHistoryItem(' + index + ')">' +
         '<span class="h-type">表 ' + h.outer + ' → 内 ' + h.inner + '</span>' +
-        '<span class="h-meta">' + h.version + '题 · ' + h.time + '</span>' +
+        '<span class="h-meta">' + h.version + '题 · ' + h.time + ' 点击查看解析</span>' +
       '</div>'
     )).join('');
+  }
+
+  window.viewHistoryItem = function(index) {
+    let history = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) history = JSON.parse(raw);
+    } catch (e) { history = []; }
+    const item = history[index];
+    if (!item) return;
+    
+    const outerBase = item.outer.substring(0, 4);
+    const innerBase = item.inner.substring(0, 4);
+    const outerInfo = TYPE_DESC[outerBase] || { title: '探索者', tag: '独特的人格组合' };
+    const innerInfo = TYPE_DESC[innerBase] || { title: '探索者', tag: '独特的人格组合' };
+    
+    resultTypeOuter.textContent = item.outer;
+    resultTypeInner.textContent = item.inner;
+    resultTitle.textContent = '表面 ' + outerInfo.title + ' × 内在 ' + innerInfo.title;
+    resultTagline.textContent = '表面亚型：' + outerInfo.tag + ' ｜ 内在亚型：' + innerInfo.tag;
+    disguisePct.textContent = item.disguise + '%';
+    disguiseFill.style.width = item.disguise + '%';
+    disguiseNote.textContent = getDisguiseNote(item.disguise);
+    renderDims(item.counts.outer, item.counts.inner);
+    resultDesc.innerHTML = item.descHtml;
+    
+    quizArea.classList.add('hidden');
+    resultArea.classList.remove('hidden');
+    mainHistorySection.classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  function getDisguiseLevel(outerType, innerType) {
+    let diff = 0;
+    for (let i = 0; i < 4; i++) {
+      if (outerType[i] !== innerType[i]) diff++;
+    }
+    return Math.round((diff / 4) * 100);
+  }
+
+  function getDisguiseNote(pct) {
+    if (pct === 0) return '你的表面人格与内在人格高度一致。你呈现给世界的，基本就是真实的自己。这是一种难得的坦诚。';
+    if (pct <= 25) return '你大部分时候是真实的，只有某一维度上会不自觉地“修饰”自己。这种小伪装通常是社交润滑，不必过于在意。';
+    if (pct <= 50) return '你在两个维度上呈现出表里差异。你可能在某些场合习惯性地戴上面具，但内心始终知道真实的自己是什么样。';
+    if (pct <= 75) return '你的表面人格与内在人格有较大差异。你可能长期在扮演一个“更安全”的角色，而真实的自己被藏得比较深。';
+    return '你的表面人格与内在人格几乎完全不同。你可能非常擅长适应环境，也可能已经很久没有问过自己“我真正想要什么”。这是一个值得认真对待的信号。';
   }
 
   function showResult() {
@@ -645,18 +807,13 @@
     disguiseNote.textContent = getDisguiseNote(disguise);
     renderDims(outer.counts, inner.counts);
 
-    resultDesc.innerHTML =
-      '<h3>表面亚型：' + outer.variant + '</h3>' +
-      '<p>这是你在答题时直接呈现出来的倾向。后缀 <strong>' + outer.variant.split('-')[1] + '</strong> 揭示了你的强度特征。</p>' +
-      '<h3>内在亚型：' + inner.variant + '</h3>' +
-      '<p>这是从你对“伪装、掩饰”类问题的反应中推断出来的。后缀 <strong>' + inner.variant.split('-')[1] + '</strong> 代表了你隐藏的真实强度。</p>' +
-      '<h3>表里差异解读</h3>' +
-      '<p>' + getDisguiseNote(disguise) + '</p>' +
-      '<p>需要说明的是，这里的“内在亚型”不是绝对真相，而是基于你对隐藏类问题的反应推断出的倾向。它更像一面镜子，帮你看到自己在哪些维度上习惯性地“修饰”自己。表里差异本身不是问题，重要的是你是否知道自己在修饰，以及为什么修饰。</p>';
+    const descHtml = generateDetailedText(outer.variant, inner.variant, disguise, currentVersion);
+    resultDesc.innerHTML = descHtml;
       
     quizArea.classList.add('hidden');
     resultArea.classList.remove('hidden');
-    saveToHistory(outer.variant, inner.variant, currentVersion, { outer: outer.counts, inner: inner.counts });
+    saveToHistory(outer.variant, inner.variant, currentVersion, { outer: outer.counts, inner: inner.counts }, disguise, descHtml);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function restartTest() {
@@ -665,6 +822,7 @@
     resultArea.classList.add('hidden');
     quizArea.classList.remove('hidden');
     renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   versionTabs.forEach(tab => {
